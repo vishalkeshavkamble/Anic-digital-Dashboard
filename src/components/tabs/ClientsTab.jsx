@@ -27,6 +27,7 @@ export default function ClientsTab() {
                   <div><span className="text-gray-500 dark:text-gray-400">Phone: </span><EditableText value={c.phone} onSave={(v) => update(c.id, { phone: v })} className="text-gray-700 dark:text-gray-300" /></div>
                   <div><span className="text-gray-500 dark:text-gray-400">Email: </span><EditableText value={c.email} onSave={(v) => update(c.id, { email: v })} className="text-gray-700 dark:text-gray-300" /></div>
                   <div><span className="text-gray-500 dark:text-gray-400">MRR: </span><span className="font-semibold text-indigo-600">₹{c.mrr?.toLocaleString()}</span></div>
+                  {c.onboardedBy && <div><span className="text-gray-500 dark:text-gray-400">By: </span><span className="font-semibold text-indigo-600">{c.onboardedBy}</span></div>}
                 </div>
               </div>
               <select value={c.status} onChange={(e) => update(c.id, { status: e.target.value })}

@@ -16,13 +16,41 @@ const SERVICES_LIST = [
   { id: 'automations', name: 'Automations', icon: '⚡', basePrice: 10000 },
 ];
 
+const PIPELINE_STAGES = ['New Lead', 'Interested', 'Proposal Sent', 'Negotiation', 'Onboarded', 'Active Customer', 'Churned'];
+
+const SALES_REPS = ['Anic', 'Sneha', 'Ravi', 'Divya'];
+
 const initialState = {
   clients: [
-    { id: 1, name: 'TechNova Inc', contact: 'Sarah Chen', phone: '+91 98765 43210', email: 'sarah@technova.io', status: 'active', notes: 'Premium client, high engagement', services: [{ id: 'meta', rating: 5 }, { id: 'google', rating: 4 }, { id: 'seo', rating: 5 }, { id: 'website', rating: 4 }], startDate: '2024-06-01', duration: 12, mrr: 52000 },
-    { id: 2, name: 'GreenLeaf Co', contact: 'Mike Torres', phone: '+91 87654 32109', email: 'mike@greenleaf.com', status: 'active', notes: 'E-commerce focused', services: [{ id: 'social', rating: 4 }, { id: 'shopify', rating: 5 }, { id: 'meta', rating: 3 }], startDate: '2024-09-01', duration: 6, mrr: 35000 },
-    { id: 3, name: 'UrbanPulse', contact: 'Lisa Park', phone: '+91 76543 21098', email: 'lisa@urbanpulse.in', status: 'active', notes: 'Real estate niche', services: [{ id: 'google', rating: 4 }, { id: 'seo', rating: 4 }, { id: 'video', rating: 3 }], startDate: '2024-03-15', duration: 12, mrr: 47000 },
-    { id: 4, name: 'Meridian Finance', contact: 'James Wright', phone: '+91 65432 10987', email: 'james@meridian.fin', status: 'at-risk', notes: 'Payment delays, needs follow-up', services: [{ id: 'website', rating: 3 }, { id: 'seo', rating: 2 }, { id: 'dashboards', rating: 4 }], startDate: '2024-08-01', duration: 6, mrr: 45000 },
-    { id: 5, name: 'BlueWave Media', contact: 'Anna Kim', phone: '+91 54321 09876', email: 'anna@bluewave.media', status: 'active', notes: 'Entertainment vertical', services: [{ id: 'social', rating: 5 }, { id: 'video', rating: 5 }, { id: 'meta', rating: 4 }, { id: 'amazon', rating: 3 }], startDate: '2024-07-01', duration: 12, mrr: 58000 },
+    { id: 1, name: 'TechNova Inc', contact: 'Sarah Chen', phone: '+91 98765 43210', email: 'sarah@technova.io', status: 'active', notes: 'Premium client, high engagement', services: [{ id: 'meta', rating: 5 }, { id: 'google', rating: 4 }, { id: 'seo', rating: 5 }, { id: 'website', rating: 4 }], startDate: '2024-06-01', duration: 12, mrr: 52000, onboardedBy: 'Anic' },
+    { id: 2, name: 'GreenLeaf Co', contact: 'Mike Torres', phone: '+91 87654 32109', email: 'mike@greenleaf.com', status: 'active', notes: 'E-commerce focused', services: [{ id: 'social', rating: 4 }, { id: 'shopify', rating: 5 }, { id: 'meta', rating: 3 }], startDate: '2024-09-01', duration: 6, mrr: 35000, onboardedBy: 'Sneha' },
+    { id: 3, name: 'UrbanPulse', contact: 'Lisa Park', phone: '+91 76543 21098', email: 'lisa@urbanpulse.in', status: 'active', notes: 'Real estate niche', services: [{ id: 'google', rating: 4 }, { id: 'seo', rating: 4 }, { id: 'video', rating: 3 }], startDate: '2024-03-15', duration: 12, mrr: 47000, onboardedBy: 'Ravi' },
+    { id: 4, name: 'Meridian Finance', contact: 'James Wright', phone: '+91 65432 10987', email: 'james@meridian.fin', status: 'at-risk', notes: 'Payment delays, needs follow-up', services: [{ id: 'website', rating: 3 }, { id: 'seo', rating: 2 }, { id: 'dashboards', rating: 4 }], startDate: '2024-08-01', duration: 6, mrr: 45000, onboardedBy: 'Divya' },
+    { id: 5, name: 'BlueWave Media', contact: 'Anna Kim', phone: '+91 54321 09876', email: 'anna@bluewave.media', status: 'active', notes: 'Entertainment vertical', services: [{ id: 'social', rating: 5 }, { id: 'video', rating: 5 }, { id: 'meta', rating: 4 }, { id: 'amazon', rating: 3 }], startDate: '2024-07-01', duration: 12, mrr: 58000, onboardedBy: 'Anic' },
+  ],
+  leads: [
+    // New Lead
+    { id: 101, company: 'Horizon Tech', contact: 'Amit Saxena', phone: '+91 99001 10011', email: 'amit@horizontech.in', services: ['Meta Ads', 'Google Ads'], value: 30000, stage: 'New Lead', rep: 'Anic', source: 'LinkedIn', lastActivity: '2026-03-28', notes: '' },
+    { id: 102, company: 'FreshBite Foods', contact: 'Prerna Jain', phone: '+91 99002 20022', email: 'prerna@freshbite.com', services: ['Social Media', 'Video'], value: 25000, stage: 'New Lead', rep: 'Sneha', source: 'Referral', lastActivity: '2026-03-29', notes: '' },
+    // Interested
+    { id: 103, company: 'CloudSync Labs', contact: 'Rohan Desai', phone: '+91 99003 30033', email: 'rohan@cloudsync.io', services: ['SEO', 'Website', 'Dashboards'], value: 45000, stage: 'Interested', rep: 'Ravi', source: 'Google Search', lastActivity: '2026-03-27', notes: 'Wants full digital presence' },
+    { id: 104, company: 'StyleVault', contact: 'Meghna Rao', phone: '+91 99004 40044', email: 'meghna@stylevault.in', services: ['Shopify Store', 'Meta Ads'], value: 33000, stage: 'Interested', rep: 'Divya', source: 'Instagram', lastActivity: '2026-03-26', notes: 'Fashion brand, DTC model' },
+    { id: 105, company: 'PetPals India', contact: 'Kiran Nair', phone: '+91 99005 50055', email: 'kiran@petpals.in', services: ['Social Media', 'Google Ads'], value: 22000, stage: 'Interested', rep: 'Sneha', source: 'Referral', lastActivity: '2026-03-30', notes: '' },
+    // Proposal Sent
+    { id: 106, company: 'FinEdge Capital', contact: 'Arjun Kapoor', phone: '+91 99006 60066', email: 'arjun@finedge.com', services: ['SEO', 'Google Ads', 'Automations'], value: 37000, stage: 'Proposal Sent', rep: 'Anic', source: 'LinkedIn', lastActivity: '2026-03-25', notes: 'Proposal sent Mar 25' },
+    { id: 107, company: 'TravelNest', contact: 'Sonal Mehta', phone: '+91 99007 70077', email: 'sonal@travelnest.co', services: ['Meta Ads', 'Video', 'Social Media'], value: 42000, stage: 'Proposal Sent', rep: 'Ravi', source: 'Event', lastActivity: '2026-03-24', notes: 'Met at marketing summit' },
+    // Negotiation
+    { id: 108, company: 'EduSpark', contact: 'Neeraj Sharma', phone: '+91 99008 80088', email: 'neeraj@eduspark.edu', services: ['Website', 'SEO', 'Meta Ads'], value: 52000, stage: 'Negotiation', rep: 'Divya', source: 'Google Search', lastActivity: '2026-03-29', notes: 'Negotiating 6-month vs 12-month' },
+    { id: 109, company: 'AutoDrive Motors', contact: 'Vikram Singh', phone: '+91 99009 90099', email: 'vikram@autodrive.in', services: ['Google Ads', 'Video', 'Dashboards'], value: 48000, stage: 'Negotiation', rep: 'Anic', source: 'Referral', lastActivity: '2026-03-28', notes: 'Close by April 5' },
+    // Onboarded (recently converted)
+    { id: 110, company: 'NovaStar Health', contact: 'Dr. Reema Patel', phone: '+91 99010 10100', email: 'reema@novastar.health', services: ['Website', 'SEO', 'Google Ads'], value: 40000, stage: 'Onboarded', rep: 'Sneha', source: 'LinkedIn', lastActivity: '2026-03-20', notes: 'Onboarded Mar 20' },
+    { id: 111, company: 'Prism Design Co', contact: 'Aditya Kulkarni', phone: '+91 99011 11111', email: 'aditya@prismdesign.co', services: ['Shopify Store', 'Social Media'], value: 28000, stage: 'Onboarded', rep: 'Ravi', source: 'Instagram', lastActivity: '2026-03-22', notes: 'Onboarded Mar 22' },
+    // Active Customer
+    { id: 112, company: 'TechNova Inc', contact: 'Sarah Chen', phone: '+91 98765 43210', email: 'sarah@technova.io', services: ['Meta Ads', 'Google Ads', 'SEO', 'Website'], value: 52000, stage: 'Active Customer', rep: 'Anic', source: 'Referral', lastActivity: '2026-03-30', notes: 'Premium client since Jun 2024' },
+    { id: 113, company: 'BlueWave Media', contact: 'Anna Kim', phone: '+91 54321 09876', email: 'anna@bluewave.media', services: ['Social Media', 'Video', 'Meta Ads', 'Amazon Ads'], value: 58000, stage: 'Active Customer', rep: 'Anic', source: 'Event', lastActivity: '2026-03-30', notes: 'High engagement' },
+    // Churned
+    { id: 114, company: 'QuickMart', contact: 'Rahul Verma', phone: '+91 99014 14014', email: 'rahul@quickmart.in', services: ['Flipkart Ads', 'Amazon Ads'], value: 20000, stage: 'Churned', rep: 'Divya', source: 'Google Search', lastActivity: '2026-01-15', notes: 'Budget constraints' },
+    { id: 115, company: 'ZenFit Gym', contact: 'Pooja Thakur', phone: '+91 99015 15015', email: 'pooja@zenfit.in', services: ['Social Media', 'Meta Ads'], value: 18000, stage: 'Churned', rep: 'Sneha', source: 'Referral', lastActivity: '2026-02-10', notes: 'Seasonal business, may return' },
   ],
   payments: [
     { id: 1, clientId: 1, clientName: 'TechNova Inc', amount: 52000, dueDate: '2026-03-01', status: 'paid', paidDate: '2026-03-01' },
@@ -70,6 +98,12 @@ function reducer(state, action) {
       return { ...state, clients: state.clients.map((c) => (c.id === action.id ? { ...c, ...action.payload } : c)) };
     case 'DELETE_CLIENT':
       return { ...state, clients: state.clients.filter((c) => c.id !== action.id) };
+    case 'ADD_LEAD':
+      return { ...state, leads: [...state.leads, { ...action.payload, id: Date.now() }] };
+    case 'UPDATE_LEAD':
+      return { ...state, leads: state.leads.map((l) => (l.id === action.id ? { ...l, ...action.payload } : l)) };
+    case 'DELETE_LEAD':
+      return { ...state, leads: state.leads.filter((l) => l.id !== action.id) };
     case 'ADD_PAYMENT':
       return { ...state, payments: [...state.payments, { ...action.payload, id: Date.now() }] };
     case 'UPDATE_PAYMENT':
@@ -94,7 +128,7 @@ function reducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
-    <AppContext.Provider value={{ state, dispatch, SERVICES_LIST }}>
+    <AppContext.Provider value={{ state, dispatch, SERVICES_LIST, PIPELINE_STAGES, SALES_REPS }}>
       {children}
     </AppContext.Provider>
   );
@@ -104,4 +138,4 @@ export function useApp() {
   return useContext(AppContext);
 }
 
-export { SERVICES_LIST };
+export { SERVICES_LIST, PIPELINE_STAGES, SALES_REPS };

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import OnboardWizard from './components/onboard/OnboardWizard';
+import SalesPipelineTab from './components/tabs/SalesPipelineTab';
 import ClientsTab from './components/tabs/ClientsTab';
 import PaymentsTab from './components/tabs/PaymentsTab';
 import ScheduleTab from './components/tabs/ScheduleTab';
@@ -11,7 +12,8 @@ import SheetsTab from './components/tabs/SheetsTab';
 import Modal from './components/common/Modal';
 
 const TABS = [
-  { id: 'onboard', label: '✦ Onboard', color: 'bg-indigo-600' },
+  { id: 'onboard', label: '✦ Onboard', accent: true },
+  { id: 'sales', label: '◉ Sales' },
   { id: 'clients', label: '◑ Clients' },
   { id: 'payments', label: '◆ Payments' },
   { id: 'schedule', label: '◐ Schedule' },
@@ -22,13 +24,18 @@ const TABS = [
   { id: 'sheets', label: '▣ Sheets' },
 ];
 
+// Office hours: 9 AM – 6 PM, weekdays only
 function getAutoTheme() {
-  const h = new Date().getHours();
-  return h >= 6 && h < 18 ? 'light' : 'dark';
+  const now = new Date();
+  const h = now.getHours();
+  const day = now.getDay(); // 0=Sun, 6=Sat
+  const isWeekday = day >= 1 && day <= 5;
+  const isOfficeHours = h >= 9 && h < 18;
+  return (isWeekday && isOfficeHours) ? 'light' : 'dark';
 }
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('onboard');
+  const [activeTab, setActiveTab] = useState('sales');
   const [showOnboard, setShowOnboard] = useState(false);
   const [themeMode, setThemeMode] = useState('auto');
   const [resolvedTheme, setResolvedTheme] = useState(getAutoTheme());
@@ -53,7 +60,7 @@ export default function App() {
     else { document.exitFullscreen(); setIsFullscreen(false); }
   };
 
-  const themeIcon = themeMode === 'auto' ? '🌗' : themeMode === 'light' ? '☀️' : '🌙';
+  const themeLabel = themeMode === 'auto' ? '🌗 Auto' : themeMode === 'light' ? '☀️ Light' : '🌙 Dark';
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col transition-colors">
@@ -67,10 +74,11 @@ export default function App() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={cycleTheme} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors" title={`Theme: ${themeMode}`}>
-            {themeIcon}
+          <span className="text-xs text-gray-400 dark:text-gray-500 hidden md:block">Office: 9AM–6PM, Mon–Fri</span>
+          <button onClick={cycleTheme} className="px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg text-sm transition-colors" title={`Theme: ${themeMode}`}>
+            {themeLabel}
           </button>
-          <button onClick={toggleFullscreen} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg text-gray-500 dark:text-gray-400 transition-colors" title="Fullscreen">
+          <button onClick={toggleFullscreen} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg text-gray-500 dark:text-gray-400 transition-colors text-lg" title="Fullscreen">
             {isFullscreen ? '⊟' : '⊞'}
           </button>
         </div>
@@ -82,8 +90,12 @@ export default function App() {
           {TABS.map((tab) => (
             <button key={tab.id} onClick={() => tab.id === 'onboard' ? setShowOnboard(true) : setActiveTab(tab.id)}
               className={`px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
-                activeTab === tab.id ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-              } ${tab.color ? `${tab.color} !text-white rounded-t-lg border-0 hover:bg-indigo-700` : ''}`}>
+                tab.accent
+                  ? 'bg-indigo-600 text-white rounded-t-lg border-transparent hover:bg-indigo-700'
+                  : activeTab === tab.id
+                    ? 'border-indigo-600 text-indigo-600'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+              }`}>
               {tab.label}
             </button>
           ))}
@@ -92,6 +104,7 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto p-6 max-w-7xl mx-auto w-full">
+        {activeTab === 'sales' && <SalesPipelineTab />}
         {activeTab === 'clients' && <ClientsTab />}
         {activeTab === 'payments' && <PaymentsTab />}
         {activeTab === 'schedule' && <ScheduleTab />}
@@ -100,14 +113,6 @@ export default function App() {
         {activeTab === 'invoices' && <InvoicesTab />}
         {activeTab === 'portal' && <ClientPortalTab />}
         {activeTab === 'sheets' && <SheetsTab />}
-        {activeTab === 'onboard' && (
-          <div className="text-center py-20">
-            <div className="text-5xl mb-4">✦</div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Welcome to Anic Digital Command Center</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">Click the Onboard button above to add a new client, or select a tab to manage your agency.</p>
-            <button onClick={() => setShowOnboard(true)} className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold text-lg hover:bg-indigo-700 transition-colors">✦ Onboard New Client</button>
-          </div>
-        )}
       </main>
 
       {/* Onboard Modal */}
