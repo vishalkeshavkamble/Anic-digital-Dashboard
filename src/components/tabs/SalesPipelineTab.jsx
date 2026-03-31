@@ -98,58 +98,58 @@ export default function SalesPipelineTab() {
       </div>
 
       {/* Stage Funnel KPIs */}
-      <div className="grid grid-cols-7 gap-3">
+      <div className="grid grid-cols-4 md:grid-cols-7 gap-3">
         {stageKPIs.map(({ stage, count, value }) => (
           <div key={stage} className={`rounded-2xl border p-3 text-center transition-all hover:scale-[1.03] card-hover ${STAGE_COLORS[stage]}`}>
             <p className="text-xs font-bold uppercase tracking-wider truncate">{stage}</p>
-            <p className="text-2xl font-bold mt-1">{count}</p>
-            <p className="text-xs opacity-60 mt-0.5">₹{(value / 1000).toFixed(0)}K</p>
+            <p className="text-3xl font-bold mt-1">{count}</p>
+            <p className="text-sm opacity-60 mt-0.5">₹{(value / 1000).toFixed(0)}K</p>
           </div>
         ))}
       </div>
 
-      {/* Kanban View — columns fill available width, big readable cards */}
+      {/* Kanban View — 4-column grid, wraps into 2 rows, no scroll */}
       {view === 'kanban' && (
-        <div className="kanban-scroll flex gap-4 overflow-x-auto pb-2">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {PIPELINE_STAGES.map((stage) => {
             const stageLeads = filtered.filter((l) => l.stage === stage);
             return (
-              <div key={stage} className="min-w-[260px] flex-1">
+              <div key={stage}>
                 {/* Column header */}
-                <div className="flex items-center gap-2 mb-3 px-1">
+                <div className="flex items-center gap-2 mb-3">
                   <div className={`w-3 h-3 rounded-full ${STAGE_BADGE[stage]}`} />
-                  <span className="text-sm font-bold text-gray-900 dark:text-white">{stage}</span>
-                  <span className="text-xs bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5 font-semibold">{stageLeads.length}</span>
+                  <span className="text-base font-bold text-gray-900 dark:text-white">{stage}</span>
+                  <span className="text-sm bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-full px-2.5 py-0.5 font-semibold">{stageLeads.length}</span>
                 </div>
                 {/* Cards */}
                 <div className="space-y-3">
                   {stageLeads.map((lead) => (
-                    <div key={lead.id} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm card-hover hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 cursor-default">
+                    <div key={lead.id} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-5 shadow-sm card-hover hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 cursor-default">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <h4 className="text-base font-bold text-gray-900 dark:text-white leading-snug">{lead.company}</h4>
-                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 shrink-0">₹{(lead.value / 1000).toFixed(0)}K</span>
+                        <span className="text-base font-bold text-indigo-600 dark:text-indigo-400 shrink-0">₹{(lead.value / 1000).toFixed(0)}K</span>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{lead.contact}</p>
-                      <div className="flex flex-wrap gap-1 mb-3">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{lead.contact} · {lead.email}</p>
+                      <div className="flex flex-wrap gap-1.5 mb-3">
                         {lead.services.map((s) => (
-                          <span key={s} className="px-2 py-1 rounded-lg text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{s}</span>
+                          <span key={s} className="px-2.5 py-1 rounded-lg text-sm bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{s}</span>
                         ))}
                       </div>
-                      <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-3">
+                      <div className="flex items-center justify-between text-sm text-gray-400 dark:text-gray-500 mb-3">
                         <span>{SOURCE_ICONS[lead.source] || '📌'} {lead.source}</span>
-                        <span className="font-medium">{lead.rep}</span>
+                        <span className="font-semibold text-gray-600 dark:text-gray-300">{lead.rep}</span>
                       </div>
                       {/* Move buttons */}
-                      <div className="flex gap-1.5">
+                      <div className="flex gap-2">
                         {stageIdx(stage) > 0 && (
                           <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) - 1])}
-                            className="flex-1 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                            className="flex-1 py-2 text-sm font-semibold bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
                             ← Back
                           </button>
                         )}
                         {stageIdx(stage) < PIPELINE_STAGES.length - 1 && (
                           <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) + 1])}
-                            className="flex-1 py-1.5 text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors">
+                            className="flex-1 py-2 text-sm font-semibold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors">
                             Next →
                           </button>
                         )}
@@ -194,7 +194,7 @@ export default function SalesPipelineTab() {
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex flex-wrap gap-1">
-                      {lead.services.map((s) => <span key={s} className="px-2 py-0.5 rounded-lg text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{s}</span>)}
+                      {lead.services.map((s) => <span key={s} className="px-2.5 py-1 rounded-lg text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{s}</span>)}
                     </div>
                   </td>
                   <td className="px-5 py-3.5 font-bold text-gray-900 dark:text-white">₹{lead.value.toLocaleString()}</td>
