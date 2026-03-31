@@ -50,7 +50,7 @@ export default function ScheduleTab() {
         {sorted.map((evt) => {
           const client = state.clients.find((c) => c.id === evt.clientId);
           return (
-            <div key={evt.id} className={`flex items-center justify-between p-4 rounded-xl border ${TYPE_COLORS[evt.type] || TYPE_COLORS.task}`}>
+            <div key={evt.id} className={`flex items-center justify-between p-4 rounded-xl border hover:shadow-md transition-all ${TYPE_COLORS[evt.type] || TYPE_COLORS.task}`}>
               <div className="flex items-center gap-3">
                 <span className="text-xs font-mono font-medium w-24">{evt.date}</span>
                 <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase`}>{evt.type}</span>

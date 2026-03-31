@@ -12,23 +12,23 @@ import SheetsTab from './components/tabs/SheetsTab';
 import Modal from './components/common/Modal';
 
 const TABS = [
-  { id: 'onboard', label: '✦ Onboard', accent: true },
-  { id: 'sales', label: '◉ Sales' },
-  { id: 'clients', label: '◑ Clients' },
-  { id: 'payments', label: '◆ Payments' },
-  { id: 'schedule', label: '◐ Schedule' },
-  { id: 'messages', label: '◈ Messages' },
-  { id: 'adplatforms', label: '◈ Ad Platforms' },
-  { id: 'invoices', label: '◇ Invoices' },
-  { id: 'portal', label: '⬡ Portal' },
-  { id: 'sheets', label: '▣ Sheets' },
+  { id: 'onboard', label: 'Onboard', icon: '✦', accent: true },
+  { id: 'sales', label: 'Sales', icon: '◉' },
+  { id: 'clients', label: 'Clients', icon: '◑' },
+  { id: 'payments', label: 'Payments', icon: '◆' },
+  { id: 'schedule', label: 'Schedule', icon: '◐' },
+  { id: 'messages', label: 'Messages', icon: '◈' },
+  { id: 'adplatforms', label: 'Ad Platforms', icon: '◈' },
+  { id: 'invoices', label: 'Invoices', icon: '◇' },
+  { id: 'portal', label: 'Portal', icon: '⬡' },
+  { id: 'sheets', label: 'Sheets', icon: '▣' },
 ];
 
 // Office hours: 9 AM – 6 PM, weekdays only
 function getAutoTheme() {
   const now = new Date();
   const h = now.getHours();
-  const day = now.getDay(); // 0=Sun, 6=Sat
+  const day = now.getDay();
   const isWeekday = day >= 1 && day <= 5;
   const isOfficeHours = h >= 9 && h < 18;
   return (isWeekday && isOfficeHours) ? 'light' : 'dark';
@@ -65,7 +65,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex flex-col transition-colors">
       {/* Header */}
-      <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-6 py-3 flex items-center justify-between">
+      <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-6 py-3 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <div className="bg-indigo-600 text-white p-2 rounded-lg font-bold text-lg">AD</div>
           <div>
@@ -85,25 +85,25 @@ export default function App() {
       </header>
 
       {/* Tab Navigation */}
-      <nav className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-4 overflow-x-auto">
-        <div className="flex gap-1">
+      <nav className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-4 shrink-0 overflow-x-auto">
+        <div className="flex gap-0.5 justify-center">
           {TABS.map((tab) => (
             <button key={tab.id} onClick={() => tab.id === 'onboard' ? setShowOnboard(true) : setActiveTab(tab.id)}
-              className={`px-3 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
                 tab.accent
-                  ? 'bg-indigo-600 text-white rounded-t-lg border-transparent hover:bg-indigo-700'
+                  ? 'bg-indigo-600 text-white rounded-t-lg border-transparent hover:bg-indigo-700 mx-1'
                   : activeTab === tab.id
-                    ? 'border-indigo-600 text-indigo-600'
-                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                    ? 'border-indigo-600 text-indigo-600 dark:text-indigo-400 dark:border-indigo-400'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:border-gray-300 dark:hover:border-gray-600'
               }`}>
-              {tab.label}
+              <span className="mr-1.5">{tab.icon}</span>{tab.label}
             </button>
           ))}
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6 max-w-7xl mx-auto w-full">
+      {/* Main Content — Full width for immersive experience */}
+      <main className="flex-1 overflow-y-auto p-5 w-full">
         {activeTab === 'sales' && <SalesPipelineTab />}
         {activeTab === 'clients' && <ClientsTab />}
         {activeTab === 'payments' && <PaymentsTab />}

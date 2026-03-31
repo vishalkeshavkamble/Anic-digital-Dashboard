@@ -16,9 +16,9 @@ export default function ClientsTab() {
         </div>
         <span className="text-sm text-gray-500 dark:text-gray-400">{state.clients.length} clients</span>
       </div>
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {state.clients.map((c) => (
-          <div key={c.id} className={`bg-white dark:bg-slate-800 rounded-xl border ${c.status === 'at-risk' ? 'border-red-300 dark:border-red-800' : 'border-gray-200 dark:border-slate-700'} p-5 shadow-sm`}>
+          <div key={c.id} className={`bg-white dark:bg-slate-800 rounded-xl border ${c.status === 'at-risk' ? 'border-red-300 dark:border-red-800' : 'border-gray-200 dark:border-slate-700'} p-5 shadow-sm hover:shadow-md transition-all`}>
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1 space-y-1">
                 <EditableText value={c.name} onSave={(v) => update(c.id, { name: v })} className="text-lg font-bold text-gray-900 dark:text-white" tag="h3" />

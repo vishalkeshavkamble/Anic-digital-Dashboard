@@ -19,7 +19,7 @@ export default function PaymentsTab() {
   return (
     <div className="space-y-6">
       <h2 className="text-lg font-bold text-gray-900 dark:text-white">◆ Payments</h2>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[['Paid', totals.paid, 'bg-emerald-500'], ['Due', totals.due, 'bg-amber-500'], ['Overdue', totals.overdue, 'bg-red-500']].map(([label, val, bg]) => (
           <div key={label} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm">
             <div className="flex items-center gap-2 mb-1">
@@ -30,7 +30,7 @@ export default function PaymentsTab() {
           </div>
         ))}
       </div>
-      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 dark:bg-slate-700/50 text-left">

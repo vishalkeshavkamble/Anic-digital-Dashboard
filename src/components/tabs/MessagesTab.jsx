@@ -14,7 +14,7 @@ export default function MessagesTab() {
       <div className="space-y-2">
         {sorted.map((msg) => (
           <button key={msg.id} onClick={() => setViewMsg(msg)}
-            className="w-full text-left bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm hover:shadow-md transition-shadow">
+            className="w-full text-left bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm hover:shadow-md hover:border-indigo-200 dark:hover:border-indigo-800 transition-all">
             <div className="flex items-center justify-between mb-1">
               <div className="flex items-center gap-2">
                 <span className={`px-2 py-0.5 rounded text-xs font-bold ${msg.type === 'whatsapp' ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'}`}>
@@ -25,7 +25,7 @@ export default function MessagesTab() {
               <span className="text-xs text-gray-400">{new Date(msg.date).toLocaleDateString()} {new Date(msg.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">{msg.subject}</p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 truncate">{msg.body}</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 line-clamp-2">{msg.body}</p>
           </button>
         ))}
       </div>
