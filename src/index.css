@@ -13,34 +13,21 @@
   --color-brand-700: #4338ca;
   --color-brand-800: #3730a3;
   --color-brand-900: #312e81;
-
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  transition: background-color 0.3s, color 0.3s;
 }
 
 #root {
   min-height: 100vh;
 }
 
-/* Dark mode body */
-.dark body,
-.dark #root {
-  background-color: #020617;
-}
-
-/* Smooth transitions for theme switching */
 * {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-/* Override transitions for chart elements to avoid flickering */
 .recharts-wrapper *,
 .recharts-surface * {
   transition: none !important;
