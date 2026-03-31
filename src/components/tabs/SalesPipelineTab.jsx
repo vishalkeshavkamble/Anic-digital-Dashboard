@@ -111,9 +111,9 @@ export default function SalesPipelineTab() {
       <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
         {stageKPIs.map(({ stage, count, value }) => (
           <div key={stage} className={`rounded-xl border p-2.5 text-center transition-all hover:scale-[1.02] ${STAGE_COLORS[stage]}`}>
-            <p className="text-[10px] font-bold uppercase tracking-wider truncate">{STAGE_SHORT[stage]}</p>
-            <p className="text-xl font-bold mt-0.5">{count}</p>
-            <p className="text-[10px] opacity-70">₹{(value / 1000).toFixed(0)}K</p>
+            <p className="text-xs font-bold uppercase tracking-wider truncate">{STAGE_SHORT[stage]}</p>
+            <p className="text-2xl font-bold mt-0.5">{count}</p>
+            <p className="text-xs opacity-70">₹{(value / 1000).toFixed(0)}K</p>
           </div>
         ))}
       </div>
@@ -126,41 +126,41 @@ export default function SalesPipelineTab() {
             return (
               <div key={stage} className="min-w-0">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <div className={`w-2 h-2 rounded-full shrink-0 ${STAGE_BADGE[stage]}`} />
-                  <span className="text-xs font-bold text-gray-900 dark:text-white truncate">{STAGE_SHORT[stage]}</span>
-                  <span className="text-[10px] bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-full px-1.5 py-0.5 font-medium shrink-0">{stageLeads.length}</span>
+                  <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${STAGE_BADGE[stage]}`} />
+                  <span className="text-sm font-bold text-gray-900 dark:text-white truncate">{STAGE_SHORT[stage]}</span>
+                  <span className="text-xs bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-full px-1.5 py-0.5 font-medium shrink-0">{stageLeads.length}</span>
                 </div>
                 <div className="space-y-1.5">
                   {stageLeads.map((lead) => (
-                    <div key={lead.id} className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-2 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600 transition-all cursor-default">
+                    <div key={lead.id} className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-slate-700 p-2.5 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600 transition-all cursor-default">
                       <div className="flex items-start justify-between gap-1 mb-1">
-                        <h4 className="text-xs font-bold text-gray-900 dark:text-white leading-tight truncate">{lead.company}</h4>
-                        <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 shrink-0">₹{(lead.value / 1000).toFixed(0)}K</span>
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white leading-tight truncate">{lead.company}</h4>
+                        <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 shrink-0">₹{(lead.value / 1000).toFixed(0)}K</span>
                       </div>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{lead.contact}</p>
-                      <div className="flex flex-wrap gap-0.5 my-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{lead.contact}</p>
+                      <div className="flex flex-wrap gap-0.5 my-1.5">
                         {lead.services.slice(0, 2).map((s) => (
-                          <span key={s} className="px-1 py-0.5 rounded text-[9px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium truncate max-w-full">{s}</span>
+                          <span key={s} className="px-1.5 py-0.5 rounded text-[11px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium truncate max-w-full">{s}</span>
                         ))}
                         {lead.services.length > 2 && (
-                          <span className="px-1 py-0.5 rounded text-[9px] bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 font-medium">+{lead.services.length - 2}</span>
+                          <span className="px-1.5 py-0.5 rounded text-[11px] bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 font-medium">+{lead.services.length - 2}</span>
                         )}
                       </div>
-                      <div className="flex items-center justify-between text-[9px] text-gray-400 dark:text-gray-500 mb-1.5">
+                      <div className="flex items-center justify-between text-[11px] text-gray-400 dark:text-gray-500 mb-1.5">
                         <span>{SOURCE_ICONS[lead.source] || '📌'} {lead.source.split(' ')[0]}</span>
                         <span className="font-medium text-gray-500 dark:text-gray-400">{lead.rep}</span>
                       </div>
-                      {/* Move buttons — compact */}
+                      {/* Move buttons */}
                       <div className="flex gap-0.5">
                         {stageIdx(stage) > 0 && (
                           <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) - 1])}
-                            className="flex-1 py-0.5 text-[9px] font-medium bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 rounded hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors" title={`Move to ${PIPELINE_STAGES[stageIdx(stage) - 1]}`}>
+                            className="flex-1 py-1 text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 rounded hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors" title={`Move to ${PIPELINE_STAGES[stageIdx(stage) - 1]}`}>
                             ←
                           </button>
                         )}
                         {stageIdx(stage) < PIPELINE_STAGES.length - 1 && (
                           <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) + 1])}
-                            className="flex-1 py-0.5 text-[9px] font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors" title={`Move to ${PIPELINE_STAGES[stageIdx(stage) + 1]}`}>
+                            className="flex-1 py-1 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors" title={`Move to ${PIPELINE_STAGES[stageIdx(stage) + 1]}`}>
                             →
                           </button>
                         )}
@@ -168,7 +168,7 @@ export default function SalesPipelineTab() {
                     </div>
                   ))}
                   {stageLeads.length === 0 && (
-                    <div className="text-center py-6 text-[10px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-dashed border-gray-200 dark:border-slate-700">No leads</div>
+                    <div className="text-center py-6 text-xs text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-slate-800/50 rounded-lg border border-dashed border-gray-200 dark:border-slate-700">No leads</div>
                   )}
                 </div>
               </div>
@@ -247,7 +247,7 @@ export default function SalesPipelineTab() {
               <div className="w-full bg-gray-100 dark:bg-slate-700 rounded-full h-2">
                 <div className="h-2 rounded-full bg-indigo-500 transition-all" style={{ width: `${rate}%` }} />
               </div>
-              <p className="text-[10px] text-gray-400 mt-1">{rate}% conversion rate</p>
+              <p className="text-xs text-gray-400 mt-1">{rate}% conversion rate</p>
             </div>
           ))}
         </div>
