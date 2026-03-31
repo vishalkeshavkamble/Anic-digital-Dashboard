@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useCallback } from 'react';
+import { createContext, useContext, useReducer } from 'react';
 
 const AppContext = createContext();
 
@@ -20,6 +20,16 @@ const PIPELINE_STAGES = ['New Lead', 'Interested', 'Proposal Sent', 'Negotiation
 
 const SALES_REPS = ['Anic', 'Sneha', 'Ravi', 'Divya'];
 
+// Helper: map service display name → service ID
+function serviceNameToId(name) {
+  const n = name.trim().toLowerCase();
+  const match = SERVICES_LIST.find((s) => s.name.toLowerCase() === n || s.id === n);
+  return match ? match.id : null;
+}
+
+let _nextId = Date.now();
+function nextId() { return ++_nextId; }
+
 const initialState = {
   clients: [
     { id: 1, name: 'TechNova Inc', contact: 'Sarah Chen', phone: '+91 98765 43210', email: 'sarah@technova.io', status: 'active', notes: 'Premium client, high engagement', services: [{ id: 'meta', rating: 5 }, { id: 'google', rating: 4 }, { id: 'seo', rating: 5 }, { id: 'website', rating: 4 }], startDate: '2024-06-01', duration: 12, mrr: 52000, onboardedBy: 'Anic' },
@@ -29,26 +39,19 @@ const initialState = {
     { id: 5, name: 'BlueWave Media', contact: 'Anna Kim', phone: '+91 54321 09876', email: 'anna@bluewave.media', status: 'active', notes: 'Entertainment vertical', services: [{ id: 'social', rating: 5 }, { id: 'video', rating: 5 }, { id: 'meta', rating: 4 }, { id: 'amazon', rating: 3 }], startDate: '2024-07-01', duration: 12, mrr: 58000, onboardedBy: 'Anic' },
   ],
   leads: [
-    // New Lead
     { id: 101, company: 'Horizon Tech', contact: 'Amit Saxena', phone: '+91 99001 10011', email: 'amit@horizontech.in', services: ['Meta Ads', 'Google Ads'], value: 30000, stage: 'New Lead', rep: 'Anic', source: 'LinkedIn', lastActivity: '2026-03-28', notes: '' },
-    { id: 102, company: 'FreshBite Foods', contact: 'Prerna Jain', phone: '+91 99002 20022', email: 'prerna@freshbite.com', services: ['Social Media', 'Video'], value: 25000, stage: 'New Lead', rep: 'Sneha', source: 'Referral', lastActivity: '2026-03-29', notes: '' },
-    // Interested
+    { id: 102, company: 'FreshBite Foods', contact: 'Prerna Jain', phone: '+91 99002 20022', email: 'prerna@freshbite.com', services: ['Social Media', 'Video Production'], value: 25000, stage: 'New Lead', rep: 'Sneha', source: 'Referral', lastActivity: '2026-03-29', notes: '' },
     { id: 103, company: 'CloudSync Labs', contact: 'Rohan Desai', phone: '+91 99003 30033', email: 'rohan@cloudsync.io', services: ['SEO', 'Website', 'Dashboards'], value: 45000, stage: 'Interested', rep: 'Ravi', source: 'Google Search', lastActivity: '2026-03-27', notes: 'Wants full digital presence' },
     { id: 104, company: 'StyleVault', contact: 'Meghna Rao', phone: '+91 99004 40044', email: 'meghna@stylevault.in', services: ['Shopify Store', 'Meta Ads'], value: 33000, stage: 'Interested', rep: 'Divya', source: 'Instagram', lastActivity: '2026-03-26', notes: 'Fashion brand, DTC model' },
     { id: 105, company: 'PetPals India', contact: 'Kiran Nair', phone: '+91 99005 50055', email: 'kiran@petpals.in', services: ['Social Media', 'Google Ads'], value: 22000, stage: 'Interested', rep: 'Sneha', source: 'Referral', lastActivity: '2026-03-30', notes: '' },
-    // Proposal Sent
     { id: 106, company: 'FinEdge Capital', contact: 'Arjun Kapoor', phone: '+91 99006 60066', email: 'arjun@finedge.com', services: ['SEO', 'Google Ads', 'Automations'], value: 37000, stage: 'Proposal Sent', rep: 'Anic', source: 'LinkedIn', lastActivity: '2026-03-25', notes: 'Proposal sent Mar 25' },
-    { id: 107, company: 'TravelNest', contact: 'Sonal Mehta', phone: '+91 99007 70077', email: 'sonal@travelnest.co', services: ['Meta Ads', 'Video', 'Social Media'], value: 42000, stage: 'Proposal Sent', rep: 'Ravi', source: 'Event', lastActivity: '2026-03-24', notes: 'Met at marketing summit' },
-    // Negotiation
+    { id: 107, company: 'TravelNest', contact: 'Sonal Mehta', phone: '+91 99007 70077', email: 'sonal@travelnest.co', services: ['Meta Ads', 'Video Production', 'Social Media'], value: 42000, stage: 'Proposal Sent', rep: 'Ravi', source: 'Event', lastActivity: '2026-03-24', notes: 'Met at marketing summit' },
     { id: 108, company: 'EduSpark', contact: 'Neeraj Sharma', phone: '+91 99008 80088', email: 'neeraj@eduspark.edu', services: ['Website', 'SEO', 'Meta Ads'], value: 52000, stage: 'Negotiation', rep: 'Divya', source: 'Google Search', lastActivity: '2026-03-29', notes: 'Negotiating 6-month vs 12-month' },
-    { id: 109, company: 'AutoDrive Motors', contact: 'Vikram Singh', phone: '+91 99009 90099', email: 'vikram@autodrive.in', services: ['Google Ads', 'Video', 'Dashboards'], value: 48000, stage: 'Negotiation', rep: 'Anic', source: 'Referral', lastActivity: '2026-03-28', notes: 'Close by April 5' },
-    // Onboarded (recently converted)
+    { id: 109, company: 'AutoDrive Motors', contact: 'Vikram Singh', phone: '+91 99009 90099', email: 'vikram@autodrive.in', services: ['Google Ads', 'Video Production', 'Dashboards'], value: 48000, stage: 'Negotiation', rep: 'Anic', source: 'Referral', lastActivity: '2026-03-28', notes: 'Close by April 5' },
     { id: 110, company: 'NovaStar Health', contact: 'Dr. Reema Patel', phone: '+91 99010 10100', email: 'reema@novastar.health', services: ['Website', 'SEO', 'Google Ads'], value: 40000, stage: 'Onboarded', rep: 'Sneha', source: 'LinkedIn', lastActivity: '2026-03-20', notes: 'Onboarded Mar 20' },
     { id: 111, company: 'Prism Design Co', contact: 'Aditya Kulkarni', phone: '+91 99011 11111', email: 'aditya@prismdesign.co', services: ['Shopify Store', 'Social Media'], value: 28000, stage: 'Onboarded', rep: 'Ravi', source: 'Instagram', lastActivity: '2026-03-22', notes: 'Onboarded Mar 22' },
-    // Active Customer
     { id: 112, company: 'TechNova Inc', contact: 'Sarah Chen', phone: '+91 98765 43210', email: 'sarah@technova.io', services: ['Meta Ads', 'Google Ads', 'SEO', 'Website'], value: 52000, stage: 'Active Customer', rep: 'Anic', source: 'Referral', lastActivity: '2026-03-30', notes: 'Premium client since Jun 2024' },
-    { id: 113, company: 'BlueWave Media', contact: 'Anna Kim', phone: '+91 54321 09876', email: 'anna@bluewave.media', services: ['Social Media', 'Video', 'Meta Ads', 'Amazon Ads'], value: 58000, stage: 'Active Customer', rep: 'Anic', source: 'Event', lastActivity: '2026-03-30', notes: 'High engagement' },
-    // Churned
+    { id: 113, company: 'BlueWave Media', contact: 'Anna Kim', phone: '+91 54321 09876', email: 'anna@bluewave.media', services: ['Social Media', 'Video Production', 'Meta Ads', 'Amazon Ads'], value: 58000, stage: 'Active Customer', rep: 'Anic', source: 'Event', lastActivity: '2026-03-30', notes: 'High engagement' },
     { id: 114, company: 'QuickMart', contact: 'Rahul Verma', phone: '+91 99014 14014', email: 'rahul@quickmart.in', services: ['Flipkart Ads', 'Amazon Ads'], value: 20000, stage: 'Churned', rep: 'Divya', source: 'Google Search', lastActivity: '2026-01-15', notes: 'Budget constraints' },
     { id: 115, company: 'ZenFit Gym', contact: 'Pooja Thakur', phone: '+91 99015 15015', email: 'pooja@zenfit.in', services: ['Social Media', 'Meta Ads'], value: 18000, stage: 'Churned', rep: 'Sneha', source: 'Referral', lastActivity: '2026-02-10', notes: 'Seasonal business, may return' },
   ],
@@ -92,30 +95,32 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case 'ADD_CLIENT':
-      return { ...state, clients: [...state.clients, { ...action.payload, id: Date.now() }] };
+    case 'ADD_CLIENT': {
+      const id = nextId();
+      return { ...state, clients: [...state.clients, { ...action.payload, id }], _lastClientId: id };
+    }
     case 'UPDATE_CLIENT':
       return { ...state, clients: state.clients.map((c) => (c.id === action.id ? { ...c, ...action.payload } : c)) };
     case 'DELETE_CLIENT':
       return { ...state, clients: state.clients.filter((c) => c.id !== action.id) };
     case 'ADD_LEAD':
-      return { ...state, leads: [...state.leads, { ...action.payload, id: Date.now() }] };
+      return { ...state, leads: [...state.leads, { ...action.payload, id: nextId() }] };
     case 'UPDATE_LEAD':
       return { ...state, leads: state.leads.map((l) => (l.id === action.id ? { ...l, ...action.payload } : l)) };
     case 'DELETE_LEAD':
       return { ...state, leads: state.leads.filter((l) => l.id !== action.id) };
     case 'ADD_PAYMENT':
-      return { ...state, payments: [...state.payments, { ...action.payload, id: Date.now() }] };
+      return { ...state, payments: [...state.payments, { ...action.payload, id: nextId() }] };
     case 'UPDATE_PAYMENT':
       return { ...state, payments: state.payments.map((p) => (p.id === action.id ? { ...p, ...action.payload } : p)) };
     case 'ADD_SCHEDULE':
-      return { ...state, schedule: [...state.schedule, { ...action.payload, id: Date.now() }] };
+      return { ...state, schedule: [...state.schedule, { ...action.payload, id: nextId() }] };
     case 'DELETE_SCHEDULE':
       return { ...state, schedule: state.schedule.filter((s) => s.id !== action.id) };
     case 'ADD_MESSAGE':
-      return { ...state, messages: [{ ...action.payload, id: Date.now(), date: new Date().toISOString() }, ...state.messages] };
+      return { ...state, messages: [{ ...action.payload, id: nextId(), date: new Date().toISOString() }, ...state.messages] };
     case 'ADD_INVOICE':
-      return { ...state, invoices: [...state.invoices, { ...action.payload, id: Date.now() }] };
+      return { ...state, invoices: [...state.invoices, { ...action.payload, id: nextId() }] };
     case 'UPDATE_INVOICE':
       return { ...state, invoices: state.invoices.map((i) => (i.id === action.id ? { ...i, ...action.payload } : i)) };
     case 'UPDATE_SHEETS_CONFIG':
@@ -128,7 +133,7 @@ function reducer(state, action) {
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
   return (
-    <AppContext.Provider value={{ state, dispatch, SERVICES_LIST, PIPELINE_STAGES, SALES_REPS }}>
+    <AppContext.Provider value={{ state, dispatch, SERVICES_LIST, PIPELINE_STAGES, SALES_REPS, serviceNameToId }}>
       {children}
     </AppContext.Provider>
   );
@@ -138,4 +143,4 @@ export function useApp() {
   return useContext(AppContext);
 }
 
-export { SERVICES_LIST, PIPELINE_STAGES, SALES_REPS };
+export { SERVICES_LIST, PIPELINE_STAGES, SALES_REPS, serviceNameToId };

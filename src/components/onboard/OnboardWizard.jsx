@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp, SERVICES_LIST } from '../../store/AppContext';
+import { useApp, SERVICES_LIST, SALES_REPS } from '../../store/AppContext';
 import StarRating from '../common/StarRating';
 import Modal from '../common/Modal';
 
@@ -11,7 +11,7 @@ const DURATIONS = [
 ];
 
 function WhatsAppPreview({ client, services, onClose }) {
-  const svcNames = services.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name).join(', ');
+  const svcNames = services.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name).filter(Boolean).join(', ');
   return (
     <Modal open onClose={onClose} title="WhatsApp Message Preview">
       <div className="bg-[#e5ddd5] dark:bg-[#0b141a] rounded-xl p-4 space-y-2">
@@ -38,7 +38,7 @@ function WhatsAppPreview({ client, services, onClose }) {
 }
 
 function EmailPreview({ client, services, onClose }) {
-  const svcNames = services.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name).join(', ');
+  const svcNames = services.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name).filter(Boolean).join(', ');
   return (
     <Modal open onClose={onClose} title="Email Preview" wide>
       <div className="bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg overflow-hidden">
@@ -64,7 +64,7 @@ function EmailPreview({ client, services, onClose }) {
 }
 
 function AgreementPreview({ client, services, onClose }) {
-  const svcNames = services.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name);
+  const svcNames = services.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name).filter(Boolean);
   const endDate = new Date(client.startDate);
   endDate.setMonth(endDate.getMonth() + client.duration);
   return (
@@ -98,13 +98,14 @@ function AgreementPreview({ client, services, onClose }) {
 }
 
 export default function OnboardWizard({ onClose }) {
-  const { dispatch } = useApp();
+  const { dispatch, SERVICES_LIST: svcList } = useApp();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ name: '', contact: '', phone: '', email: '', notes: '' });
   const [selectedServices, setSelectedServices] = useState([]);
   const [duration, setDuration] = useState(3);
   const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
-  const [preview, setPreview] = useState(null); // 'whatsapp' | 'email' | 'agreement'
+  const [onboardedBy, setOnboardedBy] = useState('Anic');
+  const [preview, setPreview] = useState(null);
   const [onboarded, setOnboarded] = useState(false);
 
   const discount = DURATIONS.find((d) => d.months === duration)?.discount || 0;
@@ -125,15 +126,47 @@ export default function OnboardWizard({ onClose }) {
     setSelectedServices((prev) => prev.map((s) => (s.id === svcId ? { ...s, rating } : s)));
   };
 
-  const clientData = { ...form, services: selectedServices, duration, startDate, mrr, status: 'active' };
+  const clientData = { ...form, services: selectedServices, duration, startDate, mrr, status: 'active', onboardedBy };
 
   const handleOnboard = () => {
+    // 1. Add client
     dispatch({ type: 'ADD_CLIENT', payload: clientData });
-    const svcNames = selectedServices.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name).join(', ');
-    dispatch({ type: 'ADD_MESSAGE', payload: { clientId: null, clientName: form.name, type: 'whatsapp', subject: 'Welcome Message', body: `Hello ${form.contact}! Welcome to Anic Digital. ${form.name} is now onboard. Services: ${svcNames}. Duration: ${duration} months. Monthly: ₹${mrr.toLocaleString()}. — Team Anic Digital` } });
-    dispatch({ type: 'ADD_MESSAGE', payload: { clientId: null, clientName: form.name, type: 'email', subject: `Service Agreement - ${form.name}`, body: `Dear ${form.contact},\n\nWelcome to Anic Digital! Services: ${svcNames}.\nDuration: ${duration} months.\nMonthly: ₹${mrr.toLocaleString()}.\n\nAttachment: Service_Agreement_${form.name.replace(/\s/g, '_')}.pdf\n\nBest regards,\nAnic Digital` } });
-    dispatch({ type: 'ADD_PAYMENT', payload: { clientId: null, clientName: form.name, amount: mrr, dueDate: startDate, status: 'due', paidDate: null } });
-    dispatch({ type: 'ADD_INVOICE', payload: { clientId: null, clientName: form.name, items: selectedServices.map((s) => ({ service: SERVICES_LIST.find((sl) => sl.id === s.id)?.name || s.id, amount: SERVICES_LIST.find((sl) => sl.id === s.id)?.basePrice || 0 })), total: mrr, date: startDate, status: 'sent', number: `ANIC-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}` } });
+
+    const svcNames = selectedServices.map((s) => SERVICES_LIST.find((sl) => sl.id === s.id)?.name).filter(Boolean).join(', ');
+
+    // 2. WhatsApp welcome
+    dispatch({ type: 'ADD_MESSAGE', payload: {
+      clientName: form.name, type: 'whatsapp', subject: 'Welcome Message',
+      body: `Hello ${form.contact}! 👋 Welcome to Anic Digital! ${form.name} is now onboard.\n\nServices: ${svcNames}\nDuration: ${duration} months\nMonthly: ₹${mrr.toLocaleString()}\n\nLet's grow together! 🚀\n— Team Anic Digital`,
+    }});
+
+    // 3. Email welcome
+    dispatch({ type: 'ADD_MESSAGE', payload: {
+      clientName: form.name, type: 'email', subject: `Service Agreement - ${form.name}`,
+      body: `Dear ${form.contact},\n\nWelcome to Anic Digital! We are excited to begin our partnership with ${form.name}.\n\nServices: ${svcNames}\nDuration: ${duration} months\nMonthly Investment: ₹${mrr.toLocaleString()}\n\nAttachment: Service_Agreement_${form.name.replace(/\s/g, '_')}.pdf\n\nBest regards,\nAnic Digital`,
+    }});
+
+    // 4. First payment
+    dispatch({ type: 'ADD_PAYMENT', payload: {
+      clientName: form.name, amount: mrr, dueDate: startDate, status: 'due', paidDate: null,
+    }});
+
+    // 5. Invoice
+    dispatch({ type: 'ADD_INVOICE', payload: {
+      clientName: form.name,
+      items: selectedServices.map((s) => ({
+        service: SERVICES_LIST.find((sl) => sl.id === s.id)?.name || s.id,
+        amount: SERVICES_LIST.find((sl) => sl.id === s.id)?.basePrice || 0,
+      })),
+      total: mrr, date: startDate, status: 'sent',
+      number: `ANIC-${new Date().getFullYear()}-${String(Date.now()).slice(-3)}`,
+    }});
+
+    // 6. Onboarding event
+    dispatch({ type: 'ADD_SCHEDULE', payload: {
+      title: `${form.name} — Onboarding`, date: startDate, type: 'onboarding', clientId: null,
+    }});
+
     setOnboarded(true);
   };
 
@@ -142,7 +175,8 @@ export default function OnboardWizard({ onClose }) {
       <div className="text-center py-10 space-y-6">
         <div className="text-6xl">🎉</div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{form.name} Onboarded!</h2>
-        <p className="text-gray-500 dark:text-gray-400">All automations triggered successfully.</p>
+        <p className="text-gray-500 dark:text-gray-400">All automations triggered: WhatsApp, Email, Agreement, Invoice, Payment, Schedule.</p>
+        <p className="text-sm text-indigo-600 font-medium">Onboarded by: {onboardedBy}</p>
         <div className="flex flex-wrap gap-3 justify-center">
           <button onClick={() => setPreview('whatsapp')} className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700">📱 View WhatsApp</button>
           <button onClick={() => setPreview('email')} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">📧 View Email</button>
@@ -181,6 +215,12 @@ export default function OnboardWizard({ onClose }) {
           <div>
             <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Notes</label>
             <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} rows={2} className="mt-1 w-full border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Onboarded By</label>
+            <select value={onboardedBy} onChange={(e) => setOnboardedBy(e.target.value)} className="mt-1 w-full border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-indigo-400">
+              {SALES_REPS.map((r) => <option key={r} value={r}>{r}</option>)}
+            </select>
           </div>
           <button onClick={() => setStep(2)} disabled={!form.name || !form.contact} className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed">Next: Select Services →</button>
         </div>
@@ -262,6 +302,7 @@ export default function OnboardWizard({ onClose }) {
               <span className="text-gray-500">Email</span><span className="text-gray-900 dark:text-white">{form.email}</span>
               <span className="text-gray-500">Duration</span><span className="text-gray-900 dark:text-white">{duration} months ({startDate} to {endDate.toISOString().slice(0, 10)})</span>
               <span className="text-gray-500">Monthly</span><span className="font-bold text-indigo-600">₹{mrr.toLocaleString()}</span>
+              <span className="text-gray-500">Onboarded By</span><span className="font-medium text-indigo-600">{onboardedBy}</span>
             </div>
             <hr className="border-gray-200 dark:border-slate-600" />
             <p className="text-gray-500 font-medium">Services:</p>
@@ -283,6 +324,8 @@ export default function OnboardWizard({ onClose }) {
             <p className="text-indigo-600 dark:text-indigo-300">📧 Welcome Email with Agreement PDF</p>
             <p className="text-indigo-600 dark:text-indigo-300">📄 Service Agreement Document</p>
             <p className="text-indigo-600 dark:text-indigo-300">🧾 First Invoice Generated</p>
+            <p className="text-indigo-600 dark:text-indigo-300">💰 First Payment Entry Created</p>
+            <p className="text-indigo-600 dark:text-indigo-300">📅 Onboarding Event Added to Schedule</p>
           </div>
           <div className="flex gap-3">
             <button onClick={() => setStep(3)} className="flex-1 py-2.5 rounded-lg border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 font-medium">← Back</button>

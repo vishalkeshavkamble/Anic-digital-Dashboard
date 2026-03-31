@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useApp, PIPELINE_STAGES, SALES_REPS } from '../../store/AppContext';
+import { useApp, PIPELINE_STAGES, SALES_REPS, serviceNameToId } from '../../store/AppContext';
 import Modal from '../common/Modal';
 
 const STAGE_COLORS = {
@@ -42,7 +42,7 @@ export default function SalesPipelineTab() {
         dispatch({ type: 'ADD_CLIENT', payload: {
           name: lead.company, contact: lead.contact, phone: lead.phone, email: lead.email,
           status: 'active', notes: `Converted from pipeline. Source: ${lead.source}`,
-          services: lead.services.map((s) => ({ id: s.toLowerCase().replace(/\s/g, ''), rating: 0 })),
+          services: lead.services.map((s) => ({ id: serviceNameToId(s) || s.toLowerCase().replace(/\s/g, ''), rating: 0 })),
           startDate: new Date().toISOString().slice(0, 10), duration: 6, mrr: lead.value, onboardedBy: lead.rep,
         }});
       }

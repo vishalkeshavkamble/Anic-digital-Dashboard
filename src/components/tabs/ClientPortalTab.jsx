@@ -7,7 +7,7 @@ export default function ClientPortalTab() {
   const [selectedClientId, setSelectedClientId] = useState(state.clients[0]?.id || null);
   const client = state.clients.find((c) => c.id === selectedClientId);
   const payments = state.payments.filter((p) => p.clientId === selectedClientId || p.clientName === client?.name);
-  const schedule = state.schedule.filter((s) => s.clientId === selectedClientId);
+  const schedule = state.schedule.filter((s) => s.clientId === selectedClientId || s.title?.toLowerCase().includes(client?.name?.toLowerCase()));
 
   return (
     <div className="space-y-6">

@@ -30,11 +30,17 @@ export default function ClientsTab() {
                   {c.onboardedBy && <div><span className="text-gray-500 dark:text-gray-400">By: </span><span className="font-semibold text-indigo-600">{c.onboardedBy}</span></div>}
                 </div>
               </div>
-              <select value={c.status} onChange={(e) => update(c.id, { status: e.target.value })}
-                className={`px-3 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${c.status === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'}`}>
-                <option value="active">Active</option>
-                <option value="at-risk">At Risk</option>
-              </select>
+              <div className="flex items-center gap-2">
+                <select value={c.status} onChange={(e) => update(c.id, { status: e.target.value })}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border-0 cursor-pointer ${c.status === 'active' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'}`}>
+                  <option value="active">Active</option>
+                  <option value="at-risk">At Risk</option>
+                </select>
+                <button onClick={() => { if (window.confirm(`Delete client "${c.name}"?`)) dispatch({ type: 'DELETE_CLIENT', id: c.id }); }}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors" title="Delete client">
+                  ✕
+                </button>
+              </div>
             </div>
             <div className="mb-3">
               <span className="text-xs text-gray-500 dark:text-gray-400">Notes: </span>
