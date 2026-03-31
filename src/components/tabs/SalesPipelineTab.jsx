@@ -108,67 +108,64 @@ export default function SalesPipelineTab() {
         ))}
       </div>
 
-      {/* Kanban View — Scroll-snap, bigger cards */}
+      {/* Kanban View — columns fill available width, big readable cards */}
       {view === 'kanban' && (
-        <>
-          <p className="text-xs text-gray-400 dark:text-gray-500">Scroll horizontally to see all stages →</p>
-          <div className="kanban-scroll flex gap-4 overflow-x-auto pb-4">
-            {PIPELINE_STAGES.map((stage) => {
-              const stageLeads = filtered.filter((l) => l.stage === stage);
-              return (
-                <div key={stage} className="min-w-[280px] w-[280px] shrink-0">
-                  {/* Column header */}
-                  <div className="flex items-center gap-2 mb-3 px-1">
-                    <div className={`w-3 h-3 rounded-full ${STAGE_BADGE[stage]}`} />
-                    <span className="text-sm font-bold text-gray-900 dark:text-white">{stage}</span>
-                    <span className="text-xs bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5 font-semibold">{stageLeads.length}</span>
-                  </div>
-                  {/* Cards */}
-                  <div className="space-y-3">
-                    {stageLeads.map((lead) => (
-                      <div key={lead.id} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm card-hover hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 cursor-default">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <h4 className="text-base font-bold text-gray-900 dark:text-white leading-snug">{lead.company}</h4>
-                          <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 shrink-0">₹{(lead.value / 1000).toFixed(0)}K</span>
-                        </div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{lead.contact}</p>
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {lead.services.map((s) => (
-                            <span key={s} className="px-2 py-1 rounded-lg text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{s}</span>
-                          ))}
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-3">
-                          <span>{SOURCE_ICONS[lead.source] || '📌'} {lead.source}</span>
-                          <span className="font-medium">{lead.rep}</span>
-                        </div>
-                        {/* Move buttons */}
-                        <div className="flex gap-1.5">
-                          {stageIdx(stage) > 0 && (
-                            <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) - 1])}
-                              className="flex-1 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
-                              ← Back
-                            </button>
-                          )}
-                          {stageIdx(stage) < PIPELINE_STAGES.length - 1 && (
-                            <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) + 1])}
-                              className="flex-1 py-1.5 text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors">
-                              Next →
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    {stageLeads.length === 0 && (
-                      <div className="text-center py-10 text-sm text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-slate-800/30 rounded-xl border-2 border-dashed border-gray-200 dark:border-slate-700">
-                        No leads
-                      </div>
-                    )}
-                  </div>
+        <div className="kanban-scroll flex gap-4 overflow-x-auto pb-2">
+          {PIPELINE_STAGES.map((stage) => {
+            const stageLeads = filtered.filter((l) => l.stage === stage);
+            return (
+              <div key={stage} className="min-w-[260px] flex-1">
+                {/* Column header */}
+                <div className="flex items-center gap-2 mb-3 px-1">
+                  <div className={`w-3 h-3 rounded-full ${STAGE_BADGE[stage]}`} />
+                  <span className="text-sm font-bold text-gray-900 dark:text-white">{stage}</span>
+                  <span className="text-xs bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 rounded-full px-2 py-0.5 font-semibold">{stageLeads.length}</span>
                 </div>
-              );
-            })}
-          </div>
-        </>
+                {/* Cards */}
+                <div className="space-y-3">
+                  {stageLeads.map((lead) => (
+                    <div key={lead.id} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm card-hover hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-600 cursor-default">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h4 className="text-base font-bold text-gray-900 dark:text-white leading-snug">{lead.company}</h4>
+                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 shrink-0">₹{(lead.value / 1000).toFixed(0)}K</span>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{lead.contact}</p>
+                      <div className="flex flex-wrap gap-1 mb-3">
+                        {lead.services.map((s) => (
+                          <span key={s} className="px-2 py-1 rounded-lg text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 font-medium">{s}</span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 mb-3">
+                        <span>{SOURCE_ICONS[lead.source] || '📌'} {lead.source}</span>
+                        <span className="font-medium">{lead.rep}</span>
+                      </div>
+                      {/* Move buttons */}
+                      <div className="flex gap-1.5">
+                        {stageIdx(stage) > 0 && (
+                          <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) - 1])}
+                            className="flex-1 py-1.5 text-xs font-semibold bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors">
+                            ← Back
+                          </button>
+                        )}
+                        {stageIdx(stage) < PIPELINE_STAGES.length - 1 && (
+                          <button onClick={() => moveStage(lead.id, PIPELINE_STAGES[stageIdx(stage) + 1])}
+                            className="flex-1 py-1.5 text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800/40 transition-colors">
+                            Next →
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {stageLeads.length === 0 && (
+                    <div className="text-center py-10 text-sm text-gray-400 dark:text-gray-500 bg-gray-50/50 dark:bg-slate-800/30 rounded-xl border-2 border-dashed border-gray-200 dark:border-slate-700">
+                      No leads
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
 
       {/* Table View */}
