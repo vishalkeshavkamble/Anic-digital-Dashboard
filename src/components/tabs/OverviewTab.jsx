@@ -1,5 +1,6 @@
 import { useApp, PIPELINE_STAGES, SALES_REPS } from '../../store/AppContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
+import AnicSaasCard from '../common/AnicSaasCard';
 
 export default function OverviewTab({ onNavigate }) {
   const { state } = useApp();
@@ -27,13 +28,19 @@ export default function OverviewTab({ onNavigate }) {
   const recentMessages = [...state.messages].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
   const upcomingSchedule = [...state.schedule].filter((s) => s.date >= new Date().toISOString().slice(0, 10)).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 4);
 
+  const totalLeads = state.leads.length;
+  const convertedLeads = state.leads.filter((l) => ['Onboarded', 'Active Customer'].includes(l.stage)).length;
+  const conversionRate = totalLeads > 0 ? Math.round((convertedLeads / totalLeads) * 100) : 0;
+
   return (
     <div className="space-y-6">
-      {/* Welcome + Quick Stats */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Welcome back to Anic Digital</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Here's your agency overview for today</p>
-      </div>
+      {/* Animated SaaS hero card */}
+      <AnicSaasCard
+        mrr={Math.round(totalMRR / 1000)}
+        clients={activeClients}
+        pipeline={Math.round(pipelineValue / 1000)}
+        conversion={conversionRate}
+      />
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
